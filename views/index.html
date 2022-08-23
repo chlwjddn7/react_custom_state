@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="react custom state">
+
+        <title>react custom state</title>
+
+        <!-- 프로그램 아이콘 -->
+        <!-- <link href="/resources/img/favicon/rdr7.ico" rel="icon"> -->
+       
+    </head>
+    <body>
+        <div id="root"></div>
+    </body>
+
+    <script>
+        let hookIndex = 0;
+        let stateStorage = [];
+
+        function useState (value) {
+            //console.log('useState 실행 초기값 : ', value);
+            stateStorage[hookIndex] = stateStorage[hookIndex] || value;
+
+            let currentHookIndex = hookIndex;
+            function setState (changeValue) {
+                stateStorage[currentHookIndex] = changeValue;
+                render();
+            }
+
+            return [stateStorage[hookIndex++], setState];
+        }
+
+        function TestComponent1 () {
+            const [number, setNumber] = useState(0);
+            const [text, setText] = useState('안녕?!');
+
+            console.log('TestComponent1 실행 number :', number);
+            console.log('TestComponent1 실행 text :', text);
+
+            window.numberIncrement = function () {
+                console.log('TestComponent1 numberIncrement 실행');
+                setNumber(number + 1);
+            }
+
+            window.textChange = function () {
+                console.log('TestComponent1 textChange 실행');
+                setText(document.getElementById('text').value);
+            }
+            window.textChangeEnter = function (e) {
+                if (e.keyCode == 13) {
+                    textChange();
+                }
+            }
+
+            return (`
+                <div id='TestComponent1-number'>
+                    <span style='margin-right: 20px;'>TestComponent1 number : ${number}</span>
+                    <button onclick='numberIncrement()'>TestComponent1 숫자 1 증가</button>
+                </div>
+                <div id='TestComponent1-text'>
+                    <input type='text' id='text' onkeyup='textChangeEnter(event)' placeholder='변경할 텍스트 입력'>
+                    <span style='margin-right: 20px;'>TestComponent1 text : ${text}</span>
+                    <button onclick='textChange()'>TestComponent1 텍스트 변경</button>
+                </div>
+            `);
+        }
+
+        function TestComponent2 () {
+            const [data, setData] = useState('0');
+            console.log('TestComponent2 실행 data :', data);
+            
+            window.dataIncrement2 = function () {
+                console.log('TestComponent2 dataIncrement 실행');
+                setData(data - 1);
+            }
+
+            return (`
+                <div id='TestComponent2' style='margin-top: 20px;'>
+                    <span style='margin-right: 20px;'>TestComponent2 Data : ${data}</span>
+                    <button onclick='dataIncrement2()'>TestComponent2 Data 1 감소</button>
+                </div>
+            `);
+        }
+
+        function render () {
+            const root = document.getElementById('root');
+            root.innerHTML = TestComponent1() + TestComponent2();
+            hookIndex = 0;
+        }
+
+        render();
+    </script>
+</html>
+
